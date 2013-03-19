@@ -14,15 +14,6 @@ module BigintPk
     install_patches! if value
   end
 
-
-  def self.update_primary_key table_name, key_name
-    update_key table_name, key_name, true
-  end
-
-  def self.update_foreign_key table_name, key_name
-    update_key table_name, key_name, false
-  end
-
   private
 
   def self.install_patches!
@@ -64,29 +55,6 @@ module BigintPk
         end
         alias_method_chain :references, :default_bigint_fk
       end
-    end
-  end
-
-
-  def self.update_key table_name, key_name, is_primary_key
-    c = ActiveRecord::Base.connection
-    case c.adapter_name
-    when 'PostgreSQL'
-      c.execute %Q{
-        ALTER TABLE #{c.quote_table_name table_name}
-        ALTER COLUMN #{c.quote_column_name key_name}
-        TYPE bigint
-      }.gsub(/\s+/, ' ').strip
-    when /^MySQL/i
-      c.execute %Q{
-        ALTER TABLE #{c.quote_table_name table_name}
-        MODIFY COLUMN #{c.quote_column_name key_name}
-        bigint(20) DEFAULT NULL #{'auto_increment' if is_primary_key}
-      }.gsub(/\s+/, ' ').strip
-    when 'SQLite'
-      # noop; sqlite always has 64bit pkeys
-    else
-      raise "Unsupported adapter '#{c.adapter_name}'"
     end
   end
 end
