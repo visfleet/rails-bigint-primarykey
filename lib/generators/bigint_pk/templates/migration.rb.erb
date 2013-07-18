@@ -5,7 +5,9 @@ class <%= @name.camelize %> < ActiveRecord::Migration
   # https://github.com/soundcloud/large-hadron-migrator
   def self.up
     Lhm.change_table :<%= @klass.table_name %> do |m|
-      m.change_column :<%= @klass.primary_key %>, "BIGINT(20) AUTO_INCREMENT"
+      <%- if @set_primary_key -%>
+      m.change_column :<%= @klass.primary_key %>, "BIGINT(20) AUTO_INCREMENT" 
+      <%- end -%>
 
       <%- @references.each do |reference| -%>
       m.change_column :<%= reference %>, "BIGINT(20)"
@@ -15,7 +17,9 @@ class <%= @name.camelize %> < ActiveRecord::Migration
 
   def self.down
     Lhm.change_table :<%= @klass.table_name %> do |m|
-      m.change_column :<%= @klass.primary_key %>, "INT(11)"
+      <%- if @set_primary_key -%>
+      m.change_column :<%= @klass.primary_key %>, "INT(11)" if @set_primary_key
+      <%- end -%>
 
       <%- @references.each do |reference| -%>
       m.change_column :<%= reference %>, "INT(11)"
