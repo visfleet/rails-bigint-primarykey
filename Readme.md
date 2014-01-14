@@ -14,7 +14,7 @@ recommended to run the test suite against your version of rails and activerecord
 ### Installation & Usage
 
 * Add the following to your `Gemfile`
-  `gem 'rails-bigint-pk', git: 'https://github.com/VerticalResponse/rails-bigint-pk.git'`
+  `gem 'rails-bigint-pk', git: 'https://github.com/Shopify/rails-bigint-pk.git'`
 
 * Run the generator
   `rails generate bigint_pk:install`
