@@ -31,7 +31,7 @@ module BigintPk
           end
 
           options[:klass] ||= klass
-          options[:set_primary_key] = klass.columns_hash[klasses.last.primary_key].sql_type != DESTINATION_TYPE
+          options[:set_primary_key] = klass.primary_key && klass.columns_hash[klass.primary_key].sql_type != DESTINATION_TYPE
           options[:references] ||= []
           options[:references].concat belongs_to_associations.map {|association| association.foreign_key }
           options[:references].uniq!

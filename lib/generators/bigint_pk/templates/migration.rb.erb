@@ -18,7 +18,7 @@ class <%= @name.camelize %> < ActiveRecord::Migration
   def self.down
     Lhm.change_table :<%= @klass.table_name %> do |m|
       <%- if @set_primary_key -%>
-      m.change_column :<%= @klass.primary_key %>, "INT(11)" if @set_primary_key
+      m.change_column :<%= @klass.primary_key %>, "INT(11)"
       <%- end -%>
 
       <%- @references.each do |reference| -%>
