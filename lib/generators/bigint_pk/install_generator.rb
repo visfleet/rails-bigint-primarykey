@@ -42,7 +42,7 @@ module BigintPk
         end
 
         version = Time.now.utc.strftime('%Y%m%d%H%M%S')
-        prefix = Time.now.utc.strftime('%b%e').downcase
+        prefix = Time.now.utc.strftime('%b%d').downcase
         number = 0
         tables.each do |table_name, options|
           @klass = options[:klass]
