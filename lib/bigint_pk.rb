@@ -30,7 +30,7 @@ module BigintPk
     end
 
     if ca.const_defined? :AbstractMysqlAdapter
-      ca::AbstractMysqlAdapter::NATIVE_DATABASE_TYPES[:primary_key] = 'bigint(20) DEFAULT NULL auto_increment PRIMARY KEY'
+      ca::AbstractMysqlAdapter::NATIVE_DATABASE_TYPES[:primary_key] = 'bigint(20) auto_increment PRIMARY KEY'
       ca::AbstractMysqlAdapter::NATIVE_DATABASE_TYPES[:integer] = { :name => "bigint", :limit => 6 }
     end
   end
