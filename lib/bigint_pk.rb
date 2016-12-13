@@ -1,15 +1,12 @@
 require 'bigint_pk/version'
+require 'bigint_pk/railtie'
 require 'active_record'
 
 module BigintPk
-  mattr_accessor :enabled
+  extend self
 
-  def self.setup
-    yield self
-  end
-
-  def self.enabled= value
-    install_patches! if value
+  def enable!
+    install_patches!
   end
 
   private
@@ -40,7 +37,7 @@ module BigintPk
     end
   end
 
-  def self.install_patches!
+  def install_patches!
     ca = ActiveRecord::ConnectionAdapters
 
     if ca.const_defined? :PostgreSQLAdapter

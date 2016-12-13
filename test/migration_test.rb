@@ -1,7 +1,7 @@
 require 'minitest/autorun'
 require 'bigint_pk'
 
-BigintPk.enabled = true
+BigintPk.enable!
 
 class MigrationTest < Minitest::Test
   def setup
