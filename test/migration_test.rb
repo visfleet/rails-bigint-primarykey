@@ -6,7 +6,7 @@ BigintPk.enable!
 class MigrationTest < Minitest::Test
   def setup
     super
-    ActiveRecord::Base.establish_connection(adapter: "mysql2", database: "bigint_test")
+    ActiveRecord::Base.establish_connection(adapter: ENV['ADAPTER'] || "mysql2", database: "bigint_test")
   end
 
   def teardown
@@ -20,7 +20,11 @@ class MigrationTest < Minitest::Test
     columns = connection.columns(:foo)
     assert_equal ['id'], columns.map(&:name)
     assert_equal [:integer], columns.map(&:type)
-    assert_equal ['bigint(20)'], columns.map(&:sql_type)
+    if ENV['ADAPTER'] == 'postgresql'
+      assert_equal ['bigint'], columns.map(&:sql_type)
+    else
+      assert_equal ['bigint(20)'], columns.map(&:sql_type)
+    end
     assert_equal [8], columns.map(&:limit)
   end
 
@@ -32,7 +36,11 @@ class MigrationTest < Minitest::Test
     columns = connection.columns(:foo)
     assert_equal ['id', 'post_id'], columns.map(&:name)
     assert_equal [:integer, :integer], columns.map(&:type)
-    assert_equal ['bigint(20)', 'bigint(20)'], columns.map(&:sql_type)
+    if ENV['ADAPTER'] == 'postgresql'
+      assert_equal ['bigint', 'bigint'], columns.map(&:sql_type)
+    else
+      assert_equal ['bigint(20)', 'bigint(20)'], columns.map(&:sql_type)
+    end
     assert_equal [8, 8], columns.map(&:limit)
   end
 end
