@@ -8,3 +8,6 @@ rvm:
 gemfiles:
   - Gemfile
   - test/gemfiles/Gemfile-Rails-4.2
+before_script:
+  - mysql -e "create database bigint_test;"
+  - psql -c "create database bigint_test;" -U postgres
