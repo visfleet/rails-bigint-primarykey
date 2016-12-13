@@ -12,5 +12,5 @@ env:
   - ADAPTER=mysql2
   - ADAPTER=postgresql
 before_script:
-  - mysql -e "create database bigint_test;"
-  - psql -c "create database bigint_test;" -U postgres
+  - rake db:mysql:build
+  - rake db:postgresql:build
