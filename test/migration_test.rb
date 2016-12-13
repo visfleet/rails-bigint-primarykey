@@ -9,7 +9,6 @@ class MigrationTest < Minitest::Test
   def setup
     super
     ActiveRecord::Base.establish_connection(adapter: "mysql2", database: "bigint_test")
-    ActiveRecord::Base.logger = Logger.new(STDOUT)
   end
 
   def teardown

@@ -4,8 +4,6 @@ require 'bigint_pk/version'
 module BigintPk
   mattr_accessor :enabled
 
-  autoload :Generators, 'generators/bigint_pk'
-
   def self.setup
     yield self
   end
