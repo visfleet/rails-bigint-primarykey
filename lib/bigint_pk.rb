@@ -1,5 +1,5 @@
-require 'active_support/all'
 require 'bigint_pk/version'
+require 'active_record'
 
 module BigintPk
   mattr_accessor :enabled

@@ -1,7 +1,5 @@
 require 'minitest/autorun'
 require 'bigint_pk'
-require 'byebug'
-require 'active_record'
 
 BigintPk.enabled = true
 
