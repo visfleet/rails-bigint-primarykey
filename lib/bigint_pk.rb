@@ -1,37 +1,23 @@
-require 'active_support/all'
 require 'bigint_pk/version'
+require 'bigint_pk/railtie'
+require 'active_record'
 
 module BigintPk
-  mattr_accessor :enabled
+  extend self
 
-  autoload :Generators, 'generators/bigint_pk'
-
-  def self.setup
-    yield self
-  end
-
-  def self.enabled= value
-    install_patches! if value
+  def enable!
+    install_patches!
   end
 
   private
 
-  def self.install_patches!
-    install_primary_key_patches!
-    install_foreign_key_patches!
-  end
-
-  def self.install_primary_key_patches!
-    ActiveRecord::Base.establish_connection
-    ca = ActiveRecord::ConnectionAdapters
-
-    if ca.const_defined? :PostgreSQLAdapter
-      ca::PostgreSQLAdapter::NATIVE_DATABASE_TYPES[:primary_key] = 'bigserial primary key'
-    end
-
-    if ca.const_defined? :AbstractMysqlAdapter
-      ca::AbstractMysqlAdapter::NATIVE_DATABASE_TYPES[:primary_key] = 'bigint(20) auto_increment PRIMARY KEY'
-      ca::AbstractMysqlAdapter::NATIVE_DATABASE_TYPES[:integer] = { :name => "bigint", :limit => 6 }
+  module DefaultBigintPrimaryKey
+    def primary_key(name, type = :primary_key, **options)
+      if type == :primary_key
+        super(name, :bigint, **options)
+      else
+        super
+      end
     end
   end
 
@@ -47,13 +33,25 @@ module BigintPk
       #   t.references :subject, polymorphic: { limit: 120 }    ==> t.integer :subject_id, limit: 8
       #                                                             t.string  :subject_type, limit: 120
       options[:polymorphic] = options.except(:polymorphic, :limit) if options[:polymorphic] == true
-      super( *args, options )
+      super(*args, options)
     end
   end
 
-  def self.install_foreign_key_patches!
-    [   ActiveRecord::ConnectionAdapters::TableDefinition,
-        ActiveRecord::ConnectionAdapters::Table].each do |abstract_table_type|
+  def install_patches!
+    ca = ActiveRecord::ConnectionAdapters
+
+    if ca.const_defined? :PostgreSQLAdapter
+      ca::PostgreSQLAdapter::NATIVE_DATABASE_TYPES[:primary_key] = 'bigserial primary key'
+    end
+
+    if ca.const_defined? :AbstractMysqlAdapter
+      ca::AbstractMysqlAdapter::NATIVE_DATABASE_TYPES[:primary_key] = 'bigint(20) auto_increment PRIMARY KEY'
+      ca::AbstractMysqlAdapter::NATIVE_DATABASE_TYPES[:integer] = { :name => "bigint", :limit => 6 }
+    end
+
+    [ca::TableDefinition,
+     ca::Table].each do |abstract_table_type|
+      abstract_table_type.prepend(DefaultBigintPrimaryKey)
       abstract_table_type.prepend(DefaultBigintForeignKeyReferences)
     end
   end
