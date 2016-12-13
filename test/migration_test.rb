@@ -26,4 +26,16 @@ class MigrationTest < Minitest::Test
     assert_equal ['bigint(20)'], columns.map(&:sql_type)
     assert_equal [8], columns.map(&:limit)
   end
+
+  def test_creating_a_reference_column_uses_bigint
+    connection = ActiveRecord::Base.connection
+    connection.create_table('foo') do |td|
+      td.references :post
+    end
+    columns = connection.columns(:foo)
+    assert_equal ['id', 'post_id'], columns.map(&:name)
+    assert_equal [:integer, :integer], columns.map(&:type)
+    assert_equal ['bigint(20)', 'bigint(20)'], columns.map(&:sql_type)
+    assert_equal [8, 8], columns.map(&:limit)
+  end
 end
