@@ -5,7 +5,7 @@ cache:
 rvm:
   - "2.2.6"
   - "2.3.3"
-gemfiles:
+gemfile:
   - Gemfile
   - test/gemfiles/Gemfile-Rails-4.2
 env:
