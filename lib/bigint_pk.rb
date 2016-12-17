@@ -11,10 +11,21 @@ module BigintPk
 
   private
 
-  module DefaultBigintPrimaryKey
+  module PostgresBigintPrimaryKey
     def primary_key(name, type = :primary_key, **options)
       if type == :primary_key
-        super(name, :bigint, **options)
+        super(name, :bigserial, **options)
+      else
+        super
+      end
+    end
+  end
+
+  module MysqlBigintPrimaryKey
+    def primary_key(name, type = :primary_key, **options)
+      if type == :primary_key
+        options[:auto_increment] = true unless options.key?(:default)
+        super(name, ActiveRecord::VERSION::MAJOR < 5 ? :primary_key : :bigint, **options)
       else
         super
       end
@@ -41,17 +52,19 @@ module BigintPk
     ca = ActiveRecord::ConnectionAdapters
 
     if ca.const_defined? :PostgreSQLAdapter
+      pk_module = PostgresBigintPrimaryKey
       ca::PostgreSQLAdapter::NATIVE_DATABASE_TYPES[:primary_key] = 'bigserial primary key'
     end
 
     if ca.const_defined? :AbstractMysqlAdapter
+      pk_module = MysqlBigintPrimaryKey
       ca::AbstractMysqlAdapter::NATIVE_DATABASE_TYPES[:primary_key] = 'bigint(20) auto_increment PRIMARY KEY'
       ca::AbstractMysqlAdapter::NATIVE_DATABASE_TYPES[:integer] = { :name => "bigint", :limit => 6 }
     end
 
     [ca::TableDefinition,
      ca::Table].each do |abstract_table_type|
-      abstract_table_type.prepend(DefaultBigintPrimaryKey)
+      abstract_table_type.prepend(pk_module)
       abstract_table_type.prepend(DefaultBigintForeignKeyReferences)
     end
   end
