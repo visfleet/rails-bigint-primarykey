@@ -1,11 +1,12 @@
 require 'minitest/autorun'
 require 'bigint_pk'
 
+BigintPk.enable!
+
 class MigrationTest < Minitest::Test
   def setup
     super
     ActiveRecord::Base.establish_connection(adapter: ENV['ADAPTER'] || "mysql2", database: "bigint_test")
-    BigintPk.enable!
   end
 
   def teardown
