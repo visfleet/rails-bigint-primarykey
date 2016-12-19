@@ -22,10 +22,10 @@ class MigrationTest < Minitest::Test
     assert_equal [:integer], columns.map(&:type)
     if ENV['ADAPTER'] == 'postgresql'
       assert_equal ['bigint'], columns.map(&:sql_type)
-      assert_equal "nextval('foo_id_seq'::regclass)", connection.exec_query("SELECT column_default FROM information_schema.columns WHERE table_name = 'foo' AND column_name = 'id'").first['column_default']
+      assert_equal ["nextval('foo_id_seq'::regclass)"], columns.map(&:default_function)
     else
       assert_equal ['bigint(20)'], columns.map(&:sql_type)
-      assert_equal '`id` bigint(20) NOT NULL AUTO_INCREMENT', connection.exec_query('SHOW CREATE TABLE `foo`').first['Create Table'].match(/`id`[^,\n]+/)[0]
+      assert_equal ['auto_increment'], columns.map(&:extra)
     end
     assert_equal [8], columns.map(&:limit)
   end
