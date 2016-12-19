@@ -1,7 +1,7 @@
 require 'minitest/autorun'
 require 'bigint_pk'
 
-BigintPk.enable!
+BigintPk.enable!(ENV['ADAPTER'] || "mysql2")
 
 class MigrationTest < Minitest::Test
   def setup

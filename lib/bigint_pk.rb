@@ -5,8 +5,8 @@ require 'active_record'
 module BigintPk
   extend self
 
-  def enable!
-    install_patches!
+  def enable!(adapter)
+    install_patches!(adapter)
   end
 
   private
@@ -48,18 +48,21 @@ module BigintPk
     end
   end
 
-  def install_patches!
+  def install_patches!(adapter)
     ca = ActiveRecord::ConnectionAdapters
 
-    if ca.const_defined? :PostgreSQLAdapter
+    case adapter
+    when 'postgresql'
       pk_module = PostgresBigintPrimaryKey
+      require 'active_record/connection_adapters/postgresql_adapter'
       ca::PostgreSQLAdapter::NATIVE_DATABASE_TYPES[:primary_key] = 'bigserial primary key'
-    end
-
-    if ca.const_defined? :AbstractMysqlAdapter
+    when /mysql\d+/
       pk_module = MysqlBigintPrimaryKey
+      require 'active_record/connection_adapters/abstract_mysql_adapter'
       ca::AbstractMysqlAdapter::NATIVE_DATABASE_TYPES[:primary_key] = 'bigint(20) auto_increment PRIMARY KEY'
       ca::AbstractMysqlAdapter::NATIVE_DATABASE_TYPES[:integer] = { :name => "bigint", :limit => 6 }
+    else
+      raise "Only MySQL and PostgreSQL adapters are supported now. Tried to patch #{adapter}."
     end
 
     [ca::TableDefinition,
