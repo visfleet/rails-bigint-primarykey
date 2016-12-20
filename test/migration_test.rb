@@ -1,7 +1,7 @@
 require 'minitest/autorun'
 require 'bigint_pk'
 
-BigintPk.enable!
+BigintPk.enable!(ENV['ADAPTER'] || "mysql2")
 
 class MigrationTest < Minitest::Test
   def setup
@@ -22,8 +22,10 @@ class MigrationTest < Minitest::Test
     assert_equal [:integer], columns.map(&:type)
     if ENV['ADAPTER'] == 'postgresql'
       assert_equal ['bigint'], columns.map(&:sql_type)
+      assert_equal ["nextval('foo_id_seq'::regclass)"], columns.map(&:default_function)
     else
       assert_equal ['bigint(20)'], columns.map(&:sql_type)
+      assert_equal ['auto_increment'], columns.map(&:extra)
     end
     assert_equal [8], columns.map(&:limit)
   end
