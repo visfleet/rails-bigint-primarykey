@@ -1,14 +1,20 @@
-## rails-bigint-pk [![Build Status](https://secure.travis-ci.org/Shopify/rails-bigint-pk.png?branch=master)](https://travis-ci.org/Shopify/rails-bigint-pk)
+## rails-bigint-primarykey [![Build Status](https://secure.travis-ci.org/Shopify/rails-bigint-primarykey.png?branch=master)](https://travis-ci.org/Shopify/rails-bigint-primarykey)
 
 ### Overview
 
-rails-bigint-pk aims to be a simple, transparent way to use 64bit primary keys
-in mysql and postgres.
+rails-bigint-primarykey aims to be a simple, transparent way to use 64bit primary keys
+in MySQL and PostgreSQL.
+
+This gem was initially a fork of the [rails-bigint-pk](https://github.com/caboteria/rails-bigint-pk) gem but it was
+significantly rewritten to support Rails 5.
 
 ### Installation & Usage
 
-* Add the following to your `Gemfile`
-  `gem 'rails-bigint-pk', git: 'https://github.com/Shopify/rails-bigint-pk.git'`
+Add the following to your `Gemfile`:
+
+```
+gem 'rails-bigint-primarykey'
+```
 
 ### Gotchas
 
@@ -23,3 +29,6 @@ end
 # Doing this will not use 64bit ints
 add_column :my_table, :other_table_id, :int
 ```
+
+When upgrading to Rails 5.1 you still need this gem if your were using it before and your migrations still use the
+version 5.0 or previous.

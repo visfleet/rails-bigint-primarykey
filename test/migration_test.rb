@@ -1,7 +1,7 @@
 require 'minitest/autorun'
-require 'bigint_pk'
+require 'bigint_primarykey'
 
-BigintPk.enable!(ENV['ADAPTER'] || "mysql2")
+BigintPrimarykey.enable!(ENV['ADAPTER'] || "mysql2")
 
 class MigrationTest < Minitest::Test
   attr_reader :connection
