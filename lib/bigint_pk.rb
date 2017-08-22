@@ -48,27 +48,53 @@ module BigintPk
     end
   end
 
-  def install_patches!(adapter)
-    ca = ActiveRecord::ConnectionAdapters
+    module CompatibilityWithBigint
+      def self.included(base)
+        base.remove_possible_method :create_table
+      end
 
-    case adapter
-    when 'postgresql'
-      pk_module = PostgresBigintPrimaryKey
-      require 'active_record/connection_adapters/postgresql_adapter'
-      ca::PostgreSQLAdapter::NATIVE_DATABASE_TYPES[:primary_key] = 'bigserial primary key'
-    when /mysql\d+/
-      pk_module = MysqlBigintPrimaryKey
-      require 'active_record/connection_adapters/abstract_mysql_adapter'
-      ca::AbstractMysqlAdapter::NATIVE_DATABASE_TYPES[:primary_key] = 'bigint(20) auto_increment PRIMARY KEY'
-      ca::AbstractMysqlAdapter::NATIVE_DATABASE_TYPES[:integer] = { :name => "bigint", :limit => 6 }
-    else
-      raise "Only MySQL and PostgreSQL adapters are supported now. Tried to patch #{adapter}."
+      def create_table(table_name, options = {})
+        if adapter_name == "PostgreSQL"
+          if options[:id] == :uuid && !options.key?(:default)
+            options[:default] = "uuid_generate_v4()"
+          end
+        end
+
+        unless adapter_name == "Mysql2" && options[:id] == :bigint
+          if [:integer, :bigint].include?(options[:id]) && !options.key?(:default)
+            options[:default] = nil
+          end
+        end
+
+        super
+      end
     end
 
-    [ca::TableDefinition,
-     ca::Table].each do |abstract_table_type|
-      abstract_table_type.prepend(pk_module)
-      abstract_table_type.prepend(DefaultBigintForeignKeyReferences)
+  def install_patches!(adapter)
+    if ActiveRecord.gem_version >= Gem::Version.new("5.1")
+      ActiveRecord::Migration::Compatibility::V5_0.include CompatibilityWithBigint
+    else
+      ca = ActiveRecord::ConnectionAdapters
+
+      case adapter
+      when 'postgresql'
+        pk_module = PostgresBigintPrimaryKey
+        require 'active_record/connection_adapters/postgresql_adapter'
+        ca::PostgreSQLAdapter::NATIVE_DATABASE_TYPES[:primary_key] = 'bigserial primary key'
+      when /mysql\d+/
+        pk_module = MysqlBigintPrimaryKey
+        require 'active_record/connection_adapters/abstract_mysql_adapter'
+        ca::AbstractMysqlAdapter::NATIVE_DATABASE_TYPES[:primary_key] = 'bigint(20) auto_increment PRIMARY KEY'
+        ca::AbstractMysqlAdapter::NATIVE_DATABASE_TYPES[:integer] = { :name => "bigint", :limit => 6 }
+      else
+        raise "Only MySQL and PostgreSQL adapters are supported now. Tried to patch #{adapter}."
+      end
+
+      [ca::TableDefinition,
+       ca::Table].each do |abstract_table_type|
+        abstract_table_type.prepend(pk_module)
+        abstract_table_type.prepend(DefaultBigintForeignKeyReferences)
+      end
     end
   end
 end
