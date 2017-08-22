@@ -10,12 +10,12 @@ namespace :db do
   namespace :mysql do
     desc 'Build the MySQL test database'
     task :build do
-      %x(mysql --user=root -e "create DATABASE bigint_test DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_unicode_ci")
+      `mysql --user=root -e "create DATABASE bigint_test DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_unicode_ci"`
     end
 
     desc 'Drop the MySQL test database'
     task :drop do
-      %x(mysqladmin --user=root -f drop bigint_test)
+      `mysqladmin --user=root -f drop bigint_test`
     end
 
     desc 'Rebuild the MySQL test database'
@@ -25,12 +25,12 @@ namespace :db do
   namespace :postgresql do
     desc 'Build the PostgreSQL test database'
     task :build do
-      %x(createdb -E UTF8 -T template0 bigint_test)
+      `createdb -E UTF8 -T template0 bigint_test`
     end
 
     desc 'Drop the PostgreSQL test databases'
     task :drop do
-      %x(dropdb bigint_test)
+      `dropdb bigint_test`
     end
 
     desc 'Rebuild the PostgreSQL test databases'

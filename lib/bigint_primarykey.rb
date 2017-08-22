@@ -48,27 +48,27 @@ module BigintPrimarykey
     end
   end
 
-    module CompatibilityWithBigint
-      def self.included(base)
-        base.remove_possible_method :create_table
-      end
-
-      def create_table(table_name, options = {})
-        if adapter_name == "PostgreSQL"
-          if options[:id] == :uuid && !options.key?(:default)
-            options[:default] = "uuid_generate_v4()"
-          end
-        end
-
-        unless adapter_name == "Mysql2" && options[:id] == :bigint
-          if [:integer, :bigint].include?(options[:id]) && !options.key?(:default)
-            options[:default] = nil
-          end
-        end
-
-        super
-      end
+  module CompatibilityWithBigint
+    def self.included(base)
+      base.remove_possible_method :create_table
     end
+
+    def create_table(table_name, options = {})
+      if adapter_name == "PostgreSQL"
+        if options[:id] == :uuid && !options.key?(:default)
+          options[:default] = "uuid_generate_v4()"
+        end
+      end
+
+      unless adapter_name == "Mysql2" && options[:id] == :bigint
+        if [:integer, :bigint].include?(options[:id]) && !options.key?(:default)
+          options[:default] = nil
+        end
+      end
+
+      super
+    end
+  end
 
   def install_patches!(adapter)
     if ActiveRecord.gem_version >= Gem::Version.new("5.1")
@@ -85,7 +85,7 @@ module BigintPrimarykey
         primarykey_module = MysqlBigintPrimaryKey
         require 'active_record/connection_adapters/abstract_mysql_adapter'
         ca::AbstractMysqlAdapter::NATIVE_DATABASE_TYPES[:primary_key] = 'bigint(20) auto_increment PRIMARY KEY'
-        ca::AbstractMysqlAdapter::NATIVE_DATABASE_TYPES[:integer] = { :name => "bigint", :limit => 6 }
+        ca::AbstractMysqlAdapter::NATIVE_DATABASE_TYPES[:integer] = { name: "bigint", limit: 6 }
       else
         raise "Only MySQL and PostgreSQL adapters are supported now. Tried to patch #{adapter}."
       end
