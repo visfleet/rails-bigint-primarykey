@@ -1,8 +1,8 @@
-require 'bigint_pk/version'
-require 'bigint_pk/railtie'
+require 'bigint_primarykey/version'
+require 'bigint_primarykey/railtie'
 require 'active_record'
 
-module BigintPk
+module BigintPrimarykey
   extend self
 
   def enable!(adapter)
@@ -78,11 +78,11 @@ module BigintPk
 
       case adapter
       when 'postgresql'
-        pk_module = PostgresBigintPrimaryKey
+        primarykey_module = PostgresBigintPrimaryKey
         require 'active_record/connection_adapters/postgresql_adapter'
         ca::PostgreSQLAdapter::NATIVE_DATABASE_TYPES[:primary_key] = 'bigserial primary key'
       when /mysql\d+/
-        pk_module = MysqlBigintPrimaryKey
+        primarykey_module = MysqlBigintPrimaryKey
         require 'active_record/connection_adapters/abstract_mysql_adapter'
         ca::AbstractMysqlAdapter::NATIVE_DATABASE_TYPES[:primary_key] = 'bigint(20) auto_increment PRIMARY KEY'
         ca::AbstractMysqlAdapter::NATIVE_DATABASE_TYPES[:integer] = { :name => "bigint", :limit => 6 }
@@ -92,7 +92,7 @@ module BigintPk
 
       [ca::TableDefinition,
        ca::Table].each do |abstract_table_type|
-        abstract_table_type.prepend(pk_module)
+        abstract_table_type.prepend(primarykey_module)
         abstract_table_type.prepend(DefaultBigintForeignKeyReferences)
       end
     end
