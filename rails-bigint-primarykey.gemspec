@@ -10,6 +10,7 @@ Gem::Specification.new do |s|
   s.homepage    = "https://github.com/Shopify/rails-bigint-primarykey"
   s.summary     = 'Easily use 64-bit primary keys in Rails'
   s.description = 'Easily use 64-bit primary keys in Rails'
+  s.license = 'MIT'
 
   s.files         = Dir["LICENSE", "Readme.md", "lib/**/*.rb"]
   s.require_paths = ["lib"]
