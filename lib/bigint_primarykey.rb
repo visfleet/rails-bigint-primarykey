@@ -71,6 +71,9 @@ module BigintPrimarykey
   end
 
   def install_patches!(adapter)
+    # Patching this to precompile assets in Buildkite
+    return if adapter == "nulldb"
+
     if ActiveRecord.gem_version >= Gem::Version.new("5.1")
       ActiveRecord::Migration::Compatibility::V5_0.include CompatibilityWithBigint
     else
